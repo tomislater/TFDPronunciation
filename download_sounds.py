@@ -16,13 +16,11 @@ def get_full_url(word):
     return url + word
 
 
-def check_file_exsist(word):
-    global sounds_dir
+def check_file_exists(word):
     try:
         return (word + '.mp3') in os.listdir(sounds_dir)
     except OSError:
-        os.makedirs(os.path.join(main_dir, 'sounds'))
-        sounds_dir = os.path.join(main_dir, 'sounds')
+        os.makedirs(sounds_dir)
         return (word + '.mp3') in os.listdir(sounds_dir)
 
 
@@ -57,7 +55,7 @@ def download_sound_url(url, name):
 
 if __name__ == '__main__':
     for word in sys.argv[1:]:
-        if check_file_exsist(word):
+        if check_file_exists(word):
             print 'File {0} exists. Omit downloading. \n'.format(word)
             continue
 
