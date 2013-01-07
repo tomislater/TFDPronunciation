@@ -11,6 +11,10 @@ url_to_sound = 'http://img2.tfd.com/pron/mp3/{name}.mp3'
 pat_us = re.compile(r"playV2\('(.*)'\)?;")
 pat_gb = re.compile(r"playV2\('(.*?)'\)")
 
+come_up_dict = {1: 'st',
+                2: 'nd',
+                3: 'rd'}
+
 
 def get_full_url(word):
     return url + word
@@ -43,7 +47,8 @@ def download_sound_url(url, name):
     full_name = name + '.mp3'
 
     while True:
-        print('{0} approach'.format(come_up))
+        print('{0}{1} approach'.format(come_up, come_up_dict.get(come_up, 'th')))
+
         try:
             s = requests.get(url)
         except requests.exceptions.ConnectionError:
