@@ -25,14 +25,17 @@ def check_file_exists(word):
 
 
 def get_sound_url(text):
-    try:
-        print 'Downloading US version'
-        return url_to_sound.format(name=pat_us.findall(text)[0])
-    except IndexError:
-        print 'US version not found'
-        print 'Downloading GB version'
-        return url_to_sound.format(name=pat_gb.findall(text)[0])
-    # TODO other exceptions
+    print('Downloading US version')
+    url = pat_us.findall(text)
+    if url:
+        return url_to_sound.format(name=url[0])
+
+    print('US version not found')
+    print('Downloading GB version')
+    url = pat_gb.findall(text)
+    if url:
+        return url_to_sound.format(name=url[0])
+    return False
 
 
 def download_sound_url(url, name):
@@ -40,7 +43,7 @@ def download_sound_url(url, name):
     full_name = name + '.mp3'
 
     while True:
-        print '{0} approach'.format(come_up)
+        print('{0} approach'.format(come_up))
         try:
             s = requests.get(url)
         except requests.exceptions.ConnectionError:
@@ -56,16 +59,17 @@ def download_sound_url(url, name):
 if __name__ == '__main__':
     for word in sys.argv[1:]:
         if check_file_exists(word):
-            print 'File {0} exists. Omit downloading. \n'.format(word)
+            print('File {0} exists. Omit downloading. \n'.format(word))
             continue
 
+        print('Downloading {word}.mp3 file'.format(word=word))
         url_word = get_full_url(word)
         r = requests.get(url_word)
         sound_url = get_sound_url(r.content)
-        print 'Sound url: {0}'.format(sound_url)
+        if sound_url:
+            name = download_sound_url(sound_url, word)
+            print('Sound {0} completely downloaded\n'.format(name))
+        else:
+            print('Pronunciation of word {0} has been not found\n'.format(word))
 
-        print 'Downloading sound'
-        name = download_sound_url(sound_url, word)
-        print 'Sound {0} completely downloaded\n'.format(name)
-
-    print 'Files: {0}'.format(', '.join(sys.argv[1:]))
+    print('Files: {0}'.format(', '.join(sys.argv[1:])))

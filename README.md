@@ -13,7 +13,7 @@ How to use
     python download_sounds.py though
 
 ###### Downloading few words
-    python download_sounds.py warn war yet polish still
+    python download_sounds.py satisfactory burial until still
 
 After downloaded your files will be in **TFDPronunciation/sounds/**
 
