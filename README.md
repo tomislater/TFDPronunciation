@@ -12,16 +12,23 @@ How to use
 ###### Downloading one word
     python download_sounds.py though
 
+    # or
+    chmod 777 download_sounds.py
+    ./download_sounds.py though
+
 ###### Downloading few words
     python download_sounds.py satisfactory burial until still
+
+    # or
+    chmod 777 download_sounds.py
+    ./download_sounds.py satisfactory burial until still
 
 After downloaded your files will be in **TFDPronunciation/sounds/**
 
 Some screenshot
 ---------------
 
-![1](https://lh3.googleusercontent.com/-kI3vBrKKv_g/UOhaHFZDZbI/AAAAAAAAAhY/Bw8Wsmvs_9Y/s782/jeden_wyraz.png)
+![1](https://lh4.googleusercontent.com/-xEbA1x8wTNk/UPMEryoGiII/AAAAAAAAAiE/YXWVkybofjw/s719/jeden_wyraz_2.png)
 
-![2](https://lh5.googleusercontent.com/-TUanjlMRq0I/UOhaH344FNI/AAAAAAAAAhc/NvYjc68dwXk/s546/jeden_wyraz_istniejacy.png)
+![2](https://lh6.googleusercontent.com/-KWKPUhXRbM0/UPMEsbFCubI/AAAAAAAAAiI/yOQJAkKKByo/s812/kilka_wyrazow_2.png)
 
-![3](https://lh5.googleusercontent.com/-0Ads1qbiFRY/UOhbe4RLvrI/AAAAAAAAAhw/HFdf120NbJQ/s769/kilka_wyrazow.png)
