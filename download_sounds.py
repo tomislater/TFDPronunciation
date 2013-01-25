@@ -116,14 +116,14 @@ if __name__ == '__main__':
 
     for word in words:
         tcw = ThreadCheckWord(queue, queue_to_search)
-        tcw.setDaemon(True)
+        tcw.daemon = True
         tcw.start()
         queue.put(word)
 
         tsw = ThreadSearchWord(queue_to_search, queue_to_download)
         td = ThreadDownloading(queue_to_download)
-        tsw.setDaemon(True)
-        td.setDaemon(True)
+        tsw.daemon = True
+        td.daemon = True
         tsw.start()
         td.start()
 
