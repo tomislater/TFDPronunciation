@@ -4,7 +4,7 @@ TFDPronunciation
 Script for downloading pronunciation of words from The Free Dictionary. This
 script for a English pronunciation.
 
-If **US** version does not exists script will download **GB** version.
+If **GB** version does not exists script will download **US** version.
 
 How to use
 ----------

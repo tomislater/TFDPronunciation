@@ -3,17 +3,16 @@
 import os
 import re
 import sys
+import Queue
 import requests
 import threading
-import Queue
 
 MAIN_DIR = os.path.split(os.path.abspath(__file__))[0]
 SOUNDS_DIR = os.path.join(MAIN_DIR, 'sounds')
 
 url = 'http://www.thefreedictionary.com/'
 URL_TO_SOUND = 'http://img2.tfd.com/pron/mp3/{name}.mp3'
-PAT_US = re.compile(r"playV2\('(.*)'\)?;")
-PAT_GB = re.compile(r"playV2\('(.*?)'\)")
+PAT = re.compile(r"playV2\('(.*?)'\)")
 
 WORDS_STATUS = {'downloaded': set(),
                 'exists': set(),
@@ -69,13 +68,11 @@ class ThreadSearchWord(threading.Thread):
         return url + word
 
     def get_sound_url(self, text):
-        url = PAT_US.findall(text)
-        if url:
-            return URL_TO_SOUND.format(name=url[0])
+        url = PAT.findall(text)
 
-        url = PAT_GB.findall(text)
         if url:
-            return URL_TO_SOUND.format(name=url[0])
+            return URL_TO_SOUND.format(name=url.pop())
+
         return False
 
 
@@ -101,10 +98,10 @@ class ThreadDownloading(threading.Thread):
             else:
                 break
 
+        WORDS_STATUS['downloaded'].add(name)
+
         with open('sounds/{0}'.format(full_name), 'wb') as f:
             f.write(s.content)
-
-        WORDS_STATUS['downloaded'].add(name)
 
 
 if __name__ == '__main__':
@@ -115,16 +112,18 @@ if __name__ == '__main__':
     queue_to_download = Queue.Queue()
 
     for word in words:
+        queue.put(word)
+
         tcw = ThreadCheckWord(queue, queue_to_search)
         tcw.daemon = True
         tcw.start()
-        queue.put(word)
 
         tsw = ThreadSearchWord(queue_to_search, queue_to_download)
-        td = ThreadDownloading(queue_to_download)
         tsw.daemon = True
-        td.daemon = True
         tsw.start()
+
+        td = ThreadDownloading(queue_to_download)
+        td.daemon = True
         td.start()
 
     queue.join()
