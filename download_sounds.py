@@ -54,15 +54,21 @@ class ThreadSearchWord(threading.Thread):
         while True:
             word = self.queue_to_search.get()
             url_word = self.get_full_url(word)
-            r = requests.get(url_word)
-            sound_url = self.get_sound_url(r.content)
 
-            if sound_url:
-                self.queue_to_download.put((sound_url, word))
-            else:
+            try:
+                r = requests.get(url_word)
+            except requests.ConnectionError as e:
                 WORDS_STATUS['not_found'].add(word)
+                print e
+            else:
+                sound_url = self.get_sound_url(r.content)
 
-            self.queue_to_search.task_done()
+                if sound_url:
+                    self.queue_to_download.put((sound_url, word))
+                else:
+                    WORDS_STATUS['not_found'].add(word)
+            finally:
+                self.queue_to_search.task_done()
 
     def get_full_url(self, word):
         return url + word
