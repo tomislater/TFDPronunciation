@@ -104,10 +104,10 @@ class ThreadDownloading(threading.Thread):
             else:
                 break
 
-        WORDS_STATUS['downloaded'].add(name)
-
         with open('sounds/{0}'.format(full_name), 'wb') as f:
             f.write(s.content)
+
+        WORDS_STATUS['downloaded'].add(name)
 
 
 if __name__ == '__main__':
@@ -136,6 +136,7 @@ if __name__ == '__main__':
     queue_to_search.join()
     queue_to_download.join()
 
-    print('Files exists: {0}'.format(', '.join(WORDS_STATUS['exists'])))
-    print('Files not_found: {0}'.format(', '.join(WORDS_STATUS['not_found'])))
-    print('Files downloaded: {0}'.format(', '.join(WORDS_STATUS['downloaded'])))
+    exists = ', '.join(WORDS_STATUS['exists'])
+    not_found = ', '.join(WORDS_STATUS['not_found'])
+    downloaded = ', '.join(WORDS_STATUS['downloaded'])
+    print("Files exists: {0}\nFiles not_found: {1}\nFiles downloaded: {2}".format(exists, not_found, downloaded))
