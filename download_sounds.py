@@ -20,21 +20,21 @@ WORDS_STATUS = {'downloaded': set(),
 
 
 class ThreadCheckWord(threading.Thread):
-    def __init__(self, queue, queue_to_search):
+    def __init__(self, queue_start, queue_to_search):
         threading.Thread.__init__(self)
-        self.queue = queue
+        self.queue_start = queue_start
         self.queue_to_search = queue_to_search
 
     def run(self):
         while True:
-            word = self.queue.get()
+            word = self.queue_start.get()
 
             if not self.check_file_exists(word):
                 self.queue_to_search.put(word)
             else:
                 WORDS_STATUS['exists'].add(word)
 
-            self.queue.task_done()
+            self.queue_start.task_done()
 
     def check_file_exists(self, word):
         try:
@@ -113,14 +113,14 @@ class ThreadDownloading(threading.Thread):
 if __name__ == '__main__':
     words = sys.argv[1:]
 
-    queue = Queue.Queue()
+    queue_start = Queue.Queue()
     queue_to_search = Queue.Queue()
     queue_to_download = Queue.Queue()
 
     for word in words:
-        queue.put(word)
+        queue_start.put(word)
 
-        tcw = ThreadCheckWord(queue, queue_to_search)
+        tcw = ThreadCheckWord(queue_start, queue_to_search)
         tcw.daemon = True
         tcw.start()
 
@@ -132,7 +132,7 @@ if __name__ == '__main__':
         td.daemon = True
         td.start()
 
-    queue.join()
+    queue_start.join()
     queue_to_search.join()
     queue_to_download.join()
 
