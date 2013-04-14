@@ -7,6 +7,8 @@ import Queue
 import requests
 import threading
 
+from termcolor import cprint
+
 MAIN_DIR = os.path.split(os.path.abspath(__file__))[0]
 SOUNDS_DIR = os.path.join(MAIN_DIR, 'sounds')
 
@@ -139,4 +141,12 @@ if __name__ == '__main__':
     exists = ', '.join(WORDS_STATUS['exists'])
     not_found = ', '.join(WORDS_STATUS['not_found'])
     downloaded = ', '.join(WORDS_STATUS['downloaded'])
-    print("Files exists: {0}\nFiles not_found: {1}\nFiles downloaded: {2}".format(exists, not_found, downloaded))
+
+    if exists:
+        cprint('Files exists: {0}'.format(exists), 'green')
+
+    if not_found:
+        cprint('Files not_found: {0}'.format(not_found), 'red')
+
+    if downloaded:
+        cprint('Files downloaded: {0}'.format(downloaded), 'blue')

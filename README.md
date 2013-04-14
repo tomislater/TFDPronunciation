@@ -6,6 +6,10 @@ script for a English pronunciation.
 
 If **GB** version does not exists script will download **US** version.
 
+You have to install termcolor:
+------------------------------
+    pip install termcolor
+
 How to use
 ----------
 
@@ -28,7 +32,4 @@ After downloaded your files will be in **TFDPronunciation/sounds/**
 Some screenshot
 ---------------
 
-![1](https://lh4.googleusercontent.com/-xEbA1x8wTNk/UPMEryoGiII/AAAAAAAAAiE/YXWVkybofjw/s719/jeden_wyraz_2.png)
-
-![2](https://lh6.googleusercontent.com/-KWKPUhXRbM0/UPMEsbFCubI/AAAAAAAAAiI/yOQJAkKKByo/s812/kilka_wyrazow_2.png)
-
+![1](https://lh6.googleusercontent.com/-Yhfk-iLDVf8/UWscRHb5ZGI/AAAAAAAAApA/7lWCTQfQBMY/s737/-bin-bash_009.png)
