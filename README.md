@@ -6,9 +6,9 @@ script for a English pronunciation.
 
 If **GB** version does not exists script will download **US** version.
 
-You have to install termcolor:
+You have to install termcolor and progressbar:
 ------------------------------
-    pip install termcolor
+    pip install termcolor progressbar
 
 How to use
 ----------
@@ -32,4 +32,6 @@ After downloaded your files will be in **TFDPronunciation/sounds/**
 Some screenshot
 ---------------
 
-![1](https://lh6.googleusercontent.com/-Yhfk-iLDVf8/UWscRHb5ZGI/AAAAAAAAApA/7lWCTQfQBMY/s737/-bin-bash_009.png)
+![1](http://1.bp.blogspot.com/-3bL34S8AYQk/UZaYxh9sL2I/AAAAAAAAAqs/iIJk4dETDp0/s1600/-bin-bash_017.png)
+
+![2](http://1.bp.blogspot.com/-tgfTTwC-fRQ/UZaYx_hvXII/AAAAAAAAAqw/Z3q4Er1nF2E/s1600/-bin-bash_018.png)

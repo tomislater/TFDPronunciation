@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os
 import re
@@ -6,6 +7,8 @@ import sys
 import Queue
 import requests
 import threading
+
+from progressbar import ProgressBar
 
 from termcolor import cprint
 
@@ -22,10 +25,11 @@ WORDS_STATUS = {'downloaded': set(),
 
 
 class ThreadCheckWord(threading.Thread):
-    def __init__(self, queue_start, queue_to_search):
+    def __init__(self, queue_start, queue_to_search, pbar):
         threading.Thread.__init__(self)
         self.queue_start = queue_start
         self.queue_to_search = queue_to_search
+        self.pbar = pbar
 
     def run(self):
         while True:
@@ -36,6 +40,7 @@ class ThreadCheckWord(threading.Thread):
             else:
                 WORDS_STATUS['exists'].add(word)
 
+            self.pbar.update(self.pbar.currval + 1)
             self.queue_start.task_done()
 
     def check_file_exists(self, word):
@@ -47,10 +52,11 @@ class ThreadCheckWord(threading.Thread):
 
 
 class ThreadSearchWord(threading.Thread):
-    def __init__(self, queue_to_search, queue_to_download):
+    def __init__(self, queue_to_search, queue_to_download, pbar):
         threading.Thread.__init__(self)
         self.queue_to_search = queue_to_search
         self.queue_to_download = queue_to_download
+        self.pbar = pbar
 
     def run(self):
         while True:
@@ -70,6 +76,7 @@ class ThreadSearchWord(threading.Thread):
                 else:
                     WORDS_STATUS['not_found'].add(word)
             finally:
+                self.pbar.update(self.pbar.currval + 1)
                 self.queue_to_search.task_done()
 
     def get_full_url(self, word):
@@ -85,14 +92,16 @@ class ThreadSearchWord(threading.Thread):
 
 
 class ThreadDownloading(threading.Thread):
-    def __init__(self, queue_to_download):
+    def __init__(self, queue_to_download, pbar):
         threading.Thread.__init__(self)
         self.queue_to_download = queue_to_download
+        self.pbar = pbar
 
     def run(self):
         while True:
             sound_url, word = self.queue_to_download.get()
             self.download_sound_url(sound_url, word)
+            self.pbar.update(self.pbar.currval + 1)
             self.queue_to_download.task_done()
 
     def download_sound_url(self, url, name):
@@ -119,24 +128,28 @@ if __name__ == '__main__':
     queue_to_search = Queue.Queue()
     queue_to_download = Queue.Queue()
 
+    pbar = ProgressBar(maxval=len(words) * 3).start()
+
     for word in words:
         queue_start.put(word)
 
-        tcw = ThreadCheckWord(queue_start, queue_to_search)
+        tcw = ThreadCheckWord(queue_start, queue_to_search, pbar)
         tcw.daemon = True
         tcw.start()
 
-        tsw = ThreadSearchWord(queue_to_search, queue_to_download)
+        tsw = ThreadSearchWord(queue_to_search, queue_to_download, pbar)
         tsw.daemon = True
         tsw.start()
 
-        td = ThreadDownloading(queue_to_download)
+        td = ThreadDownloading(queue_to_download, pbar)
         td.daemon = True
         td.start()
 
     queue_start.join()
     queue_to_search.join()
     queue_to_download.join()
+
+    pbar.finish()
 
     exists = ', '.join(WORDS_STATUS['exists'])
     not_found = ', '.join(WORDS_STATUS['not_found'])
