@@ -5,7 +5,7 @@ import os
 import re
 import sys
 import Queue
-import requests
+import urllib2
 import threading
 
 from progressbar import ProgressBar
@@ -64,12 +64,13 @@ class ThreadSearchWord(threading.Thread):
             url_word = self.get_full_url(word)
 
             try:
-                r = requests.get(url_word)
-            except requests.ConnectionError as e:
+                req = urllib2.Request(url_word)
+                r = urllib2.urlopen(req)
+            except urllib2.URLError as e:
                 WORDS_STATUS['not_found'].add(word)
                 print e
             else:
-                sound_url = self.get_sound_url(r.content)
+                sound_url = self.get_sound_url(r.read())
 
                 if sound_url:
                     self.queue_to_download.put((sound_url, word))
@@ -109,14 +110,15 @@ class ThreadDownloading(threading.Thread):
 
         while True:
             try:
-                s = requests.get(url)
-            except requests.exceptions.ConnectionError:
+                req = urllib2.Request(url)
+                s = urllib2.urlopen(req)
+            except urllib2.URLError:
                 continue
             else:
                 break
 
         with open('sounds/{0}'.format(full_name), 'wb') as f:
-            f.write(s.content)
+            f.write(s.read())
 
         WORDS_STATUS['downloaded'].add(name)
 
