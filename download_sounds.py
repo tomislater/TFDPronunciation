@@ -51,7 +51,7 @@ class CheckWord(object):
             return (word + '.mp3') in os.listdir(SOUNDS_DIR)
 
 
-class SearchWord():
+class SearchWord(object):
     def __init__(self, queue_to_search, queue_to_download, pbar):
         self.queue_to_search = queue_to_search
         self.queue_to_download = queue_to_download
@@ -92,7 +92,7 @@ class SearchWord():
         return False
 
 
-class Downloading():
+class Downloading(object):
     def __init__(self, queue_to_download, pbar):
         self.queue_to_download = queue_to_download
         self.pbar = pbar
