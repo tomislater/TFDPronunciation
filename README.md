@@ -6,9 +6,9 @@ script for a English pronunciation.
 
 If **GB** version does not exists script will download **US** version.
 
-You have to install termcolor and progressbar:
+You have to install termcolor, progressbar and gevent:
 ------------------------------
-    pip install termcolor progressbar
+    pip install termcolor progressbar gevent
 
 How to use
 ----------
