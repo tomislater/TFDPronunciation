@@ -4,13 +4,13 @@
 import os
 import re
 import sys
-import Queue
+import gevent
 import urllib2
-import threading
-
-from progressbar import ProgressBar
 
 from termcolor import cprint
+from progressbar import ProgressBar
+from gevent.queue import JoinableQueue
+
 
 MAIN_DIR = os.path.split(os.path.abspath(__file__))[0]
 SOUNDS_DIR = os.path.join(MAIN_DIR, 'sounds')
@@ -24,12 +24,12 @@ WORDS_STATUS = {'downloaded': set(),
                 'not_found': set()}
 
 
-class ThreadCheckWord(threading.Thread):
+class CheckWord(object):
     def __init__(self, queue_start, queue_to_search, pbar):
-        threading.Thread.__init__(self)
         self.queue_start = queue_start
         self.queue_to_search = queue_to_search
         self.pbar = pbar
+        self.run()
 
     def run(self):
         while True:
@@ -51,12 +51,12 @@ class ThreadCheckWord(threading.Thread):
             return (word + '.mp3') in os.listdir(SOUNDS_DIR)
 
 
-class ThreadSearchWord(threading.Thread):
+class SearchWord():
     def __init__(self, queue_to_search, queue_to_download, pbar):
-        threading.Thread.__init__(self)
         self.queue_to_search = queue_to_search
         self.queue_to_download = queue_to_download
         self.pbar = pbar
+        self.run()
 
     def run(self):
         while True:
@@ -92,11 +92,11 @@ class ThreadSearchWord(threading.Thread):
         return False
 
 
-class ThreadDownloading(threading.Thread):
+class Downloading():
     def __init__(self, queue_to_download, pbar):
-        threading.Thread.__init__(self)
         self.queue_to_download = queue_to_download
         self.pbar = pbar
+        self.run()
 
     def run(self):
         while True:
@@ -126,26 +126,19 @@ class ThreadDownloading(threading.Thread):
 if __name__ == '__main__':
     words = sys.argv[1:]
 
-    queue_start = Queue.Queue()
-    queue_to_search = Queue.Queue()
-    queue_to_download = Queue.Queue()
+    queue_start = JoinableQueue()
+    queue_to_search = JoinableQueue()
+    queue_to_download = JoinableQueue()
 
     pbar = ProgressBar(maxval=len(words) * 3).start()
 
+    for _ in xrange(len(words) / 2 + 1):
+        gevent.spawn(lambda: CheckWord(queue_start, queue_to_search, pbar))
+        gevent.spawn(lambda: SearchWord(queue_to_search, queue_to_download, pbar))
+        gevent.spawn(lambda: Downloading(queue_to_download, pbar))
+
     for word in words:
         queue_start.put(word)
-
-        tcw = ThreadCheckWord(queue_start, queue_to_search, pbar)
-        tcw.daemon = True
-        tcw.start()
-
-        tsw = ThreadSearchWord(queue_to_search, queue_to_download, pbar)
-        tsw.daemon = True
-        tsw.start()
-
-        td = ThreadDownloading(queue_to_download, pbar)
-        td.daemon = True
-        td.start()
 
     queue_start.join()
     queue_to_search.join()
