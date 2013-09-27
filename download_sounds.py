@@ -7,6 +7,11 @@ import sys
 import gevent
 import urllib2
 
+from gevent import monkey
+
+# patches stdlib to cooperate with other greenlets
+monkey.patch_all()
+
 from termcolor import cprint
 from progressbar import ProgressBar
 from gevent.queue import JoinableQueue
@@ -132,13 +137,12 @@ if __name__ == '__main__':
 
     pbar = ProgressBar(maxval=len(words) * 3).start()
 
-    for _ in xrange(len(words) / 2 + 1):
+    for word in words:
+        queue_start.put(word)
+
         gevent.spawn(lambda: CheckWord(queue_start, queue_to_search, pbar))
         gevent.spawn(lambda: SearchWord(queue_to_search, queue_to_download, pbar))
         gevent.spawn(lambda: Downloading(queue_to_download, pbar))
-
-    for word in words:
-        queue_start.put(word)
 
     queue_start.join()
     queue_to_search.join()
