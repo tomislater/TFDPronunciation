@@ -89,7 +89,7 @@ class SearchWord(object):
         return url + word
 
     def get_sound_url(self, text):
-        url = PAT.findall(text)
+        url = PAT.findall(text)[:2]
 
         if url:
             return URL_TO_SOUND.format(name=url.pop())
