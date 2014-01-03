@@ -91,8 +91,11 @@ class SearchWord(object):
     def get_sound_url(self, text):
         url = PAT.findall(text)[:2]
 
-        if url:
-            return URL_TO_SOUND.format(name=url.pop())
+        while url:
+            _url = url.pop()
+
+            if "en/US" in _url or "en/UK" in _url:
+                return URL_TO_SOUND.format(name=_url)
 
         return False
 
