@@ -35,4 +35,7 @@ nosetests.xml
 .pydevproject
 
 sounds/*.mp3
+
+# PyCharm
+atlassian-ide-plugin.xml
 .idea/

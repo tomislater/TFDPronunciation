@@ -7,7 +7,7 @@ import sys
 import gevent
 import urllib2
 
-from gevent import monkey
+from gevent import monkey, Greenlet
 
 # patches stdlib to cooperate with other greenlets
 monkey.patch_all()
@@ -29,14 +29,14 @@ WORDS_STATUS = {'downloaded': set(),
                 'not_found': set()}
 
 
-class CheckWord(object):
+class CheckWord(Greenlet):
     def __init__(self, queue_start, queue_to_search, pbar):
+        Greenlet.__init__(self)
         self.queue_start = queue_start
         self.queue_to_search = queue_to_search
         self.pbar = pbar
-        self.run()
 
-    def run(self):
+    def _run(self):
         while True:
             word = self.queue_start.get()
 
@@ -56,14 +56,14 @@ class CheckWord(object):
             return (word + '.mp3') in os.listdir(SOUNDS_DIR)
 
 
-class SearchWord(object):
+class SearchWord(Greenlet):
     def __init__(self, queue_to_search, queue_to_download, pbar):
+        Greenlet.__init__(self)
         self.queue_to_search = queue_to_search
         self.queue_to_download = queue_to_download
         self.pbar = pbar
-        self.run()
 
-    def run(self):
+    def _run(self):
         while True:
             word = self.queue_to_search.get()
             url_word = self.get_full_url(word)
@@ -100,13 +100,13 @@ class SearchWord(object):
         return False
 
 
-class Downloading(object):
+class Downloading(Greenlet):
     def __init__(self, queue_to_download, pbar):
+        Greenlet.__init__(self)
         self.queue_to_download = queue_to_download
         self.pbar = pbar
-        self.run()
 
-    def run(self):
+    def _run(self):
         while True:
             sound_url, word = self.queue_to_download.get()
             self.download_sound_url(sound_url, word)
@@ -141,11 +141,11 @@ if __name__ == '__main__':
     pbar = ProgressBar(maxval=len(words) * 3).start()
 
     for word in words:
-        queue_start.put(word)
+        queue_start.put_nowait(word)
 
-        gevent.spawn(lambda: CheckWord(queue_start, queue_to_search, pbar))
-        gevent.spawn(lambda: SearchWord(queue_to_search, queue_to_download, pbar))
-        gevent.spawn(lambda: Downloading(queue_to_download, pbar))
+        CheckWord(queue_start, queue_to_search, pbar).start()
+        SearchWord(queue_to_search, queue_to_download, pbar).start()
+        Downloading(queue_to_download, pbar).start()
 
     queue_start.join()
     queue_to_search.join()
