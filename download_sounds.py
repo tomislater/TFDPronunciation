@@ -22,7 +22,7 @@ SOUNDS_DIR = os.path.join(MAIN_DIR, 'sounds')
 
 url = 'http://www.thefreedictionary.com/'
 URL_TO_SOUND = 'http://img2.tfd.com/pron/mp3/{name}.mp3'
-PAT = re.compile(r"playV2\('(.*?)'\)")
+PAT = re.compile(r'data-snd="(.*?)"')
 
 WORDS_STATUS = {'downloaded': set(),
                 'exists': set(),
@@ -89,7 +89,7 @@ class SearchWord(Greenlet):
         return url + word
 
     def get_sound_url(self, text):
-        url = PAT.findall(text)[:2]
+        url = PAT.findall(text)
 
         while url:
             _url = url.pop()
